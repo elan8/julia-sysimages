@@ -13,7 +13,9 @@ function build_sysimage(packages, sysimage_name, description)
     
     # Add packages to the temporary environment
     println("Adding packages: $(join(packages, ", "))")
-    run(`$(Base.julia_cmd()) --project=$temp_env -e 'using Pkg; Pkg.add($packages)'`)
+    for pkg in packages
+        run(`$(Base.julia_cmd()) --project=$temp_env -e "using Pkg; Pkg.add(\"$pkg\")"`)
+    end
     
     # Build the sysimage
     println("Creating sysimage: $sysimage_name")
