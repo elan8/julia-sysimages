@@ -53,8 +53,8 @@ jobs:
     - name: Upload sysimage artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.sysimage-type }}-${{ matrix.os }}-julia-${{ github.event.inputs.release_name }}
-        path: ${{ matrix.sysimage-type }}_sysimage*
+        name: ${{ matrix.os }}-julia-${{ github.event.inputs.release_name }}
+        path: sysimage.*
         retention-days: 90
 
   create-release:
@@ -91,6 +91,6 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          combined-ubuntu-latest-julia-${{ github.event.inputs.release_name }}/combined_sysimage*
-          combined-windows-latest-julia-${{ github.event.inputs.release_name }}/combined_sysimage*
-          combined-macos-latest-julia-${{ github.event.inputs.release_name }}/combined_sysimage*
+          ubuntu-latest-julia-${{ github.event.inputs.release_name }}/sysimage.so
+          windows-latest-julia-${{ github.event.inputs.release_name }}/sysimage.dll
+          macos-latest-julia-${{ github.event.inputs.release_name }}/sysimage.dylib
