@@ -70,12 +70,12 @@ jobs:
       
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.event.inputs.release_tag }}
-        release_name: Julia ${{ github.event.inputs.release_name }} Sysimages
+        name: Julia ${{ github.event.inputs.release_name }} Sysimages
         body: |
           Julia Sysimages Release
           
@@ -90,13 +90,7 @@ jobs:
           Julia version: ${{ github.event.inputs.release_name }}
         draft: false
         prerelease: false
-        
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ matrix.sysimage-type }}-${{ matrix.os }}-julia-${{ github.event.inputs.release_name }}/${{ matrix.sysimage-type }}_sysimage*
-        asset_name: ${{ matrix.sysimage-type }}_sysimage_${{ matrix.os }}_julia_${{ github.event.inputs.release_name }}
-        asset_content_type: application/octet-stream
+        files: |
+          combined-ubuntu-latest-julia-${{ github.event.inputs.release_name }}/combined_sysimage*
+          combined-windows-latest-julia-${{ github.event.inputs.release_name }}/combined_sysimage*
+          combined-macos-latest-julia-${{ github.event.inputs.release_name }}/combined_sysimage*
