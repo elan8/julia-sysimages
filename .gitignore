@@ -1,5 +1,4 @@
 # Julia sysimage files
-*_sysimage*
 *.so
 *.dll
 *.dylib
