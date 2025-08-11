@@ -29,21 +29,10 @@ function build_sysimage(packages, sysimage_name, description)
     println("✓ $description sysimage built successfully: $sysimage_name")
 end
 
-# Define packages for each use case
-languageserver_packages = ["LanguageServer", "SymbolServer"]
-dataanalysis_packages = [
-    "DataFrames",
-    "CSV", 
-    "Plots",
-    "Flux",
-    "NearestNeighbors",
-    "Random",
-    "Statistics",
-    "StatsPlots"
-]
+# Define packages for the combined sysimage
+combined_packages = ["LanguageServer", "SymbolServer", "Plots"]
 
-# Build both sysimages
-build_sysimage(languageserver_packages, "languageserver_sysimage", "LanguageServer")
-build_sysimage(dataanalysis_packages, "dataanalysis_sysimage", "Data Analysis")
+# Build the combined sysimage
+build_sysimage(combined_packages, "combined_sysimage", "LanguageServer + Plots")
 
-println("All sysimages built successfully!")
+println("Combined sysimage built successfully!")

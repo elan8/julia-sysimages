@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        sysimage-type: [languageserver, dataanalysis]
+        sysimage-type: [combined]
     
     runs-on: ${{ matrix.os }}
     
@@ -80,8 +80,7 @@ jobs:
           Julia Sysimages Release
           
           This release contains pre-built Julia sysimages for Julia ${{ github.event.inputs.release_name }}:
-          - LanguageServer use case (LanguageServer.jl + SymbolServer)
-          - Data analysis use case (DataFrames, CSV, Plots, Flux, etc.)
+          - Combined use case (LanguageServer.jl + SymbolServer + Plots)
           
           Built for:
           - Windows

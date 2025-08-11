@@ -2,9 +2,8 @@
 Julia sysimages
 
 The purpose of this repository is to automatically build sysimages for Julia using GitHub Actions.
-The sysimages cover the following use cases:
-- **LanguageServer**: LanguageServer.jl and SymbolServer for IDE support
-- **Data analysis**: DataFrames, CSV, Plots, Flux, NearestNeighbors, Random, Statistics, and StatsPlots
+The sysimage covers the following use case:
+- **LanguageServer + Plots**: LanguageServer.jl, SymbolServer, and Plots for IDE support and plotting capabilities
 
 ## Features
 
