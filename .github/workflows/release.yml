@@ -1,0 +1,103 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name (will be used as Julia version, e.g., 1.11, 1.10, 1.9)'
+        required: true
+        default: '1.11'
+        type: string
+      release_tag:
+        description: 'Git tag for the release (e.g., v1.11.0)'
+        required: true
+        default: 'v1.11.0'
+        type: string
+
+jobs:
+  build-and-release:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        sysimage-type: [languageserver, dataanalysis]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: ${{ github.event.inputs.release_name }}
+        
+    - name: Cache Julia packages
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-julia-packages
+      with:
+        path: ~/.julia/packages
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-
+          
+    - name: Install dependencies
+      run: |
+        julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        
+    - name: Build sysimage
+      run: |
+        julia --project=. build_all_sysimages.jl
+        
+    - name: Upload sysimage artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.sysimage-type }}-${{ matrix.os }}-julia-${{ github.event.inputs.release_name }}
+        path: ${{ matrix.sysimage-type }}_sysimage*
+        retention-days: 90
+
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.inputs.release_tag }}
+        release_name: Julia ${{ github.event.inputs.release_name }} Sysimages
+        body: |
+          Julia Sysimages Release
+          
+          This release contains pre-built Julia sysimages for Julia ${{ github.event.inputs.release_name }}:
+          - LanguageServer use case (LanguageServer.jl + SymbolServer)
+          - Data analysis use case (DataFrames, CSV, Plots, Flux, etc.)
+          
+          Built for:
+          - Windows
+          - macOS  
+          - Linux
+          
+          Julia version: ${{ github.event.inputs.release_name }}
+        draft: false
+        prerelease: false
+        
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ matrix.sysimage-type }}-${{ matrix.os }}-julia-${{ github.event.inputs.release_name }}/${{ matrix.sysimage-type }}_sysimage*
+        asset_name: ${{ matrix.sysimage-type }}_sysimage_${{ matrix.os }}_julia_${{ github.event.inputs.release_name }}
+        asset_content_type: application/octet-stream
