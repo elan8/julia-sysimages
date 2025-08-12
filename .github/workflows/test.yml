@@ -1,0 +1,86 @@
+name: Test Sysimage Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      julia_version:
+        description: 'Julia version to use (e.g., 1.11, 1.10, 1.9)'
+        required: true
+        default: '1.11'
+        type: string
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        sysimage-type: [combined]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v2
+      with:
+        version: ${{ github.event.inputs.julia_version }}
+        
+    - name: Cache Julia packages
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-julia-packages
+      with:
+        path: ~/.julia/packages
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}-
+          
+    - name: Install dependencies
+      run: |
+        julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        
+    - name: Print current directory contents before build
+      run: |
+        echo "=== Current directory contents before build ==="
+        ls -la
+        echo "=== End current directory contents ==="
+        
+    - name: Build sysimage
+      run: |
+        julia --project=. build_all_sysimages.jl
+        
+    - name: Print directory contents after build
+      run: |
+        echo "=== Current directory contents after build ==="
+        ls -la
+        echo "=== End current directory contents ==="
+        
+    - name: Print sysimage files specifically
+      run: |
+        echo "=== Looking for sysimage files ==="
+        find . -name "*sysimage*" -type f
+        echo "=== End sysimage files ==="
+        
+    - name: Print all files with common sysimage extensions
+      run: |
+        echo "=== Files with .so extension ==="
+        find . -name "*.so" -type f
+        echo "=== Files with .dll extension ==="
+        find . -name "*.dll" -type f
+        echo "=== Files with .dylib extension ==="
+        find . -name "*.dylib" -type f
+        echo "=== End extension search ==="
+        
+    - name: Upload sysimage artifact (if found)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.os }}-julia-${{ github.event.inputs.julia_version }}
+        path: |
+          sysimage.*
+          *.so
+          *.dll
+          *.dylib
+        retention-days: 90
+        if-no-files-found: warn
