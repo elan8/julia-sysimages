@@ -17,22 +17,31 @@ function build_sysimage(packages, sysimage_name, description)
         run(`$(Base.julia_cmd()) --project=$temp_env -e "using Pkg; Pkg.add(\"$pkg\")"`)
     end
     
+    # Determine the appropriate extension based on the platform
+    if Sys.iswindows()
+        sysimage_path = "$(sysimage_name).dll"
+    elseif Sys.isapple()
+        sysimage_path = "$(sysimage_name).dylib"
+    else
+        sysimage_path = "$(sysimage_name).so"
+    end
+    
     # Build the sysimage
-    println("Creating sysimage: $sysimage_name")
+    println("Creating sysimage: $sysimage_path")
     create_sysimage(
         packages,
-        sysimage_path=sysimage_name,
+        sysimage_path=sysimage_path,
         project=temp_env,
         incremental=false
     )
     
-    println("✓ $description sysimage built successfully: $sysimage_name")
+    println("✓ $description sysimage built successfully: $sysimage_path")
 end
 
 # Define packages for the combined sysimage
 combined_packages = ["LanguageServer", "SymbolServer", "Plots"]
 
 # Build the combined sysimage
-build_sysimage(combined_packages, "combined_sysimage", "LanguageServer + Plots")
+build_sysimage(combined_packages, "default_sysimage", "LanguageServer + Plots")
 
-println("Combined sysimage built successfully!")
+println("Default sysimage built successfully!")
