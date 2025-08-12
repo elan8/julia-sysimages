@@ -42,6 +42,7 @@ jobs:
         julia --project=. -e 'using Pkg; Pkg.instantiate()'
         
     - name: Print current directory contents before build
+      shell: bash
       run: |
         echo "=== Current directory contents before build ==="
         ls -la
@@ -52,18 +53,21 @@ jobs:
         julia --project=. build_all_sysimages.jl
         
     - name: Print directory contents after build
+      shell: bash
       run: |
         echo "=== Current directory contents after build ==="
         ls -la
         echo "=== End current directory contents ==="
         
     - name: Print sysimage files specifically
+      shell: bash
       run: |
         echo "=== Looking for sysimage files ==="
         find . -name "*sysimage*" -type f
         echo "=== End sysimage files ==="
         
     - name: Print all files with common sysimage extensions
+      shell: bash
       run: |
         echo "=== Files with .so extension ==="
         find . -name "*.so" -type f
