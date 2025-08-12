@@ -82,7 +82,7 @@ jobs:
       with:
         name: ${{ matrix.os }}-julia-${{ github.event.inputs.julia_version }}
         path: |
-          sysimage.*
+          default_sysimage.*
           *.so
           *.dll
           *.dylib
