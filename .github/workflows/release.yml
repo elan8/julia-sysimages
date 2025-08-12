@@ -91,6 +91,6 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          ubuntu-latest-julia-${{ github.event.inputs.release_name }}/sysimage.so
-          windows-latest-julia-${{ github.event.inputs.release_name }}/sysimage.dll
-          macos-latest-julia-${{ github.event.inputs.release_name }}/sysimage.dylib
+          ubuntu-latest-julia-${{ github.event.inputs.release_name }}/*
+          windows-latest-julia-${{ github.event.inputs.release_name }}/*
+          macos-latest-julia-${{ github.event.inputs.release_name }}/*
