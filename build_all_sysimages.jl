@@ -32,7 +32,8 @@ function build_sysimage(packages, sysimage_name, description)
         packages,
         sysimage_path=sysimage_path,
         project=temp_env,
-        incremental=false
+        incremental=false,
+        cpu_target="generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)"
     )
     
     println("✓ $description sysimage built successfully: $sysimage_path")
